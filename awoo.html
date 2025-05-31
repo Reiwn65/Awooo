@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aku Cinta Lita</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #020511, #350d5e);
+      height: 100vh;
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .box {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: white ;
+      border-radius: 3px;
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3);
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      opacity: 0;
+      transform: translateX(-100px) scale(0);
+    }
+
+    .box.animate-in {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+
+    .box.glow {
+      box-shadow: 0 0 20px #ff6b6b, 0 0 40px #ff6b6b, 0 0 60px #ff1744;
+      background: linear-gradient(45deg, #ff6b6b, #ff1744);
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { 
+        box-shadow: 0 0 20px #ff6b6b, 0 0 40px #ff6b6b, 0 0 60px #ff1744;
+        transform: scale(1);
+      }
+      50% { 
+        box-shadow: 0 0 30px #ff6b6b, 0 0 60px #ff6b6b, 0 0 90px #ff1744;
+        transform: scale(1.1);
+      }
+    }
+
+    .start-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 15px 30px;
+      background: linear-gradient(45deg, #61279e, #0695c1);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 8px 15px rgba(71, 69, 69, 0.3);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .start-button:hover {
+      transform: translate(-50%, -50%) scale(1.05);
+    }
+
+    .start-button.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .message {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .message.show {
+      opacity: 1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+      50% { transform: translateY(-20px) rotate(180deg); opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="message" id="message"></div>
+    <button class="start-button" id="startBtn" onclick="startAnimation()">Coba Teken😙</button>
+  </div>
+
+  <script>
+    
+    const akuCintaPositions = {
+      A: [
+        {x: 250, y: 200}, {x: 250, y: 220}, {x: 250, y: 240}, {x: 260, y: 180}, {x: 270, y: 160},
+        {x: 280, y: 180}, {x: 290, y: 200}, {x: 290, y: 220}, {x: 290, y: 240},
+        {x: 260, y: 220}, {x: 280, y: 220}
+      ],
+      K: [
+        {x: 320, y: 160}, {x: 320, y: 180}, {x: 320, y: 200}, {x: 320, y: 220}, {x: 320, y: 240},
+        {x: 330, y: 200}, {x: 340, y: 180}, {x: 350, y: 160},
+        {x: 340, y: 220}, {x: 350, y: 240}
+      ],
+      U: [
+        {x: 380, y: 160}, {x: 380, y: 180}, {x: 380, y: 200}, {x: 380, y: 220},
+        {x: 390, y: 240}, {x: 400, y: 240}, {x: 410, y: 240},
+        {x: 420, y: 220}, {x: 420, y: 200}, {x: 420, y: 180}, {x: 420, y: 160}
+      ],
+      C: [
+        {x: 470, y: 160}, {x: 480, y: 160}, {x: 490, y: 160},
+        {x: 470, y: 180}, {x: 470, y: 200}, {x: 470, y: 220},
+        {x: 470, y: 240}, {x: 480, y: 240}, {x: 490, y: 240}
+      ],
+      I: [
+        {x: 520, y: 160}, {x: 530, y: 160}, {x: 540, y: 160},
+        {x: 530, y: 180}, {x: 530, y: 200}, {x: 530, y: 220},
+        {x: 520, y: 240}, {x: 530, y: 240}, {x: 540, y: 240}
+      ],
+      N: [
+        {x: 570, y: 160}, {x: 570, y: 180}, {x: 570, y: 200}, {x: 570, y: 220}, {x: 570, y: 240},
+        {x: 580, y: 180}, {x: 590, y: 200}, {x: 600, y: 220},
+        {x: 610, y: 160}, {x: 610, y: 180}, {x: 610, y: 200}, {x: 610, y: 220}, {x: 610, y: 240}
+      ],
+      T: [
+        {x: 640, y: 160}, {x: 650, y: 160}, {x: 660, y: 160},
+        {x: 650, y: 180}, {x: 650, y: 200}, {x: 650, y: 220}, {x: 650, y: 240}
+      ],
+      A2: [
+        {x: 690, y: 240}, {x: 690, y: 220}, {x: 690, y: 200}, {x: 700, y: 180}, {x: 710, y: 160},
+        {x: 720, y: 180}, {x: 730, y: 200}, {x: 730, y: 220}, {x: 730, y: 240},
+        {x: 700, y: 200}, {x: 720, y: 200}
+      ]
+    };
+
+   
+    const litaPositions = {
+      L: [
+        {x: 370, y: 280}, {x: 370, y: 300}, {x: 370, y: 320}, {x: 370, y: 340}, {x: 370, y: 360},
+        {x: 390, y: 360}, {x: 410, y: 360}
+      ],
+      I: [
+        {x: 450, y: 280}, {x: 470, y: 280}, {x: 490, y: 280},
+        {x: 470, y: 300}, {x: 470, y: 320}, {x: 470, y: 340},
+        {x: 450, y: 360}, {x: 470, y: 360}, {x: 490, y: 360}
+      ],
+      T: [
+        {x: 530, y: 280}, {x: 550, y: 280}, {x: 570, y: 280},
+        {x: 550, y: 300}, {x: 550, y: 320}, {x: 550, y: 340}, {x: 550, y: 360}
+      ],
+      A: [
+        {x: 610, y: 360}, {x: 610, y: 340}, {x: 610, y: 320}, {x: 620, y: 300}, {x: 630, y: 280},
+        {x: 640, y: 300}, {x: 650, y: 320}, {x: 650, y: 340}, {x: 650, y: 360},
+        {x: 620, y: 320}, {x: 640, y: 320}
+      ]
+    };
+
+    
+    const loveChatShape = [];
+    const centerX = 500; 
+    const centerY = 280; 
+    
+    for (let angle = 0; angle < Math.PI * 2; angle += 0.15) {
+      const x = centerX + 80 * Math.pow(Math.sin(angle), 3);
+      const y = centerY - (50 * Math.cos(angle) - 18 * Math.cos(2 * angle) - 8 * Math.cos(3 * angle) - 3 * Math.cos(4 * angle));
+      loveChatShape.push({ x, y });
+    }
+
+    let boxes = [];
+    let currentPhase = 'waiting';
+
+    function createBox(x, y, delay = 0) {
+      const box = document.createElement('div');
+      box.className = 'box';
+      box.style.left = x + 'px';
+      box.style.top = y + 'px';
+      document.querySelector('.container').appendChild(box);
+      setTimeout(() => {
+        box.classList.add('animate-in');
+      }, delay);
+      return box;
+    }
+
+    function startAnimation() {
+      const startBtn = document.getElementById('startBtn');
+      const message = document.getElementById('message');
+      startBtn.classList.add('hidden');
+      message.classList.add('show');
+      currentPhase = 'forming-text';
+      formAkuCintaLita();
+    }
+
+    function formAkuCintaLita() {
+      let delay = 0;
+      
+      // Buat "AKU CINTA" terlebih dahulu
+      Object.values(akuCintaPositions).forEach(letter => {
+        letter.forEach(pos => {
+          const box = createBox(pos.x, pos.y, delay);
+          boxes.push(box);
+          delay += 80;
+        });
+      });
+
+      
+      setTimeout(() => {
+        Object.values(litaPositions).forEach(letter => {
+          letter.forEach(pos => {
+            const box = createBox(pos.x, pos.y, delay);
+            boxes.push(box);
+            delay += 80;
+          });
+        });
+      }, 500);
+
+      setTimeout(() => {
+        currentPhase = 'formed-text';
+        setTimeout(() => {
+          transformToLoveChat();
+        }, 3000);
+      }, delay + 2000);
+    }
+
+    function transformToLoveChat() {
+      const message = document.getElementById('message');
+      message.textContent = 'hore horeee🥳🥳🥳';
+      currentPhase = 'transforming';
+      
+      boxes.forEach(box => {
+        box.style.transform = 'scale(0) rotate(360deg)';
+        box.style.opacity = '0';
+      });
+
+      setTimeout(() => {
+        boxes.forEach(box => box.remove());
+        boxes = [];
+        formLoveChat();
+      }, 500);
+    }
+
+    function formLoveChat() {
+      let delay = 0;
+      loveChatShape.forEach(pos => {
+        const box = createBox(pos.x, pos.y, delay);
+        boxes.push(box);
+        delay += 50;
+      });
+
+      
+      setTimeout(() => {
+        boxes.forEach((box, index) => {
+          setTimeout(() => {
+            box.classList.add('glow');
+          }, index * 30); 
+        });
+
+        const message = document.getElementById('message');
+        message.textContent = '';
+        message.style.fontSize = '36px';
+        message.style.background = 'linear-gradient(45deg, #ff6b6b, #ffd93d)';
+        message.style.webkitBackgroundClip = 'text';
+        message.style.webkitTextFillColor = 'transparent';
+        message.style.backgroundClip = 'text';
+        currentPhase = 'formed-love';
+
+        
+      }, delay + 500);
+    }
+
+   
+    function createBackgroundParticles() {
+      setInterval(() => {
+        if (currentPhase === 'formed-love') {
+          const particle = document.createElement('div');
+          particle.style.position = 'absolute';
+          particle.style.width = '4px';
+          particle.style.height = '4px';
+          particle.style.background = '#ffd93d';
+          particle.style.borderRadius = '50%';
+          particle.style.left = Math.random() * window.innerWidth + 'px';
+          particle.style.top = Math.random() * window.innerHeight + 'px';
+          particle.style.opacity = '0.7';
+          particle.style.animation = 'float 3s ease-in-out infinite';
+          document.body.appendChild(particle);
+          setTimeout(() => particle.remove(), 3000);
+        }
+      }, 200);
+    }
+
+    createBackgroundParticles();
+  </script>
+</body>
+</html>
